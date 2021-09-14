@@ -10,6 +10,7 @@ public class LaserWeapon : MonoBehaviour
     public AudioSource audio;
     public AudioClip hitEffect;
     private LineRenderer laserLine;
+    public Light flash;
 
     bool canShootLaser = true;
     bool canShoot = true;
@@ -23,7 +24,6 @@ public class LaserWeapon : MonoBehaviour
 
     void Start()
     {
-        originObject = transform;
         audio = GetComponent<AudioSource>();
         laserLine = GetComponent<LineRenderer>();
     }
@@ -41,13 +41,13 @@ public class LaserWeapon : MonoBehaviour
     public void Shoot()
     {
         canShoot = false;
-        StartCoroutine(ShootDelay());
+        StartCoroutine(ShootDelay());   
         
         RaycastHit hit;
         CharacterStats stats;
 
-        Physics.Raycast(originObject.position, originObject.forward, out hit, range); // Raycast fire forward
-        Debug.DrawRay(originObject.position, originObject.forward * range);
+        Physics.Raycast(originObject.position, -originObject.up, out hit, range); // Raycast fire forward
+        Debug.DrawRay(originObject.position, -originObject.up * range);
 
         
         if (hit.collider != null)
@@ -92,8 +92,10 @@ public class LaserWeapon : MonoBehaviour
             laserLine.SetPositions(linePoints);
 
             laserLine.endWidth = 1;
+            flash.range = 13;
 
-
+            yield return new WaitForSeconds(0.1f);
+            flash.range = 0;
             yield return new WaitForSeconds(0.1f);
         }
     }
